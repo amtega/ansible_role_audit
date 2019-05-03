@@ -1,2 +1,17 @@
 ---
 # Role tasks
+
+- name: Install required packages
+  include_tasks: install_rhel_centos.yml
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RHEL"
+
+- name: configuring audit service
+  template:
+    src: audit_config.j2
+    dest: "{{ audit_conf_file }}"
+
+- name: "insert audit rules in {{ audit_rules_file }}"
+  lineinfile:
+    path: "{{ audit_rules_file }}"
+    line: "{{ item }}"
+  with_items: "{{ audit_rules_raw_list }}"
