@@ -68,14 +68,18 @@
   tasks:
     - name: check audit configuration
       command: auditctl -l
+      register: auditctl_ouput
+
+    - debug:
+        var: auditctl_ouput
   tags:
     - idempotence
 
-- name: Cleanup vagrant sandbox
-  hosts: localhost
-  roles:
-    - role: amtega.vagrant_sandbox
-      vagrant_sandbox_state: absent
-  tags:
-    - cleanup
-    - sandbox
+# - name: Cleanup vagrant sandbox
+#   hosts: localhost
+#   roles:
+#     - role: amtega.vagrant_sandbox
+#       vagrant_sandbox_state: absent
+#   tags:
+#     - cleanup
+#     - sandbox

@@ -15,3 +15,7 @@
     path: "{{ audit_rules_file }}"
     line: "{{ item }}"
   with_items: "{{ audit_rules_raw_list }}"
+  notify: restart auditd
+
+#- name: start audit daemon
+#- notify: restart auditd
