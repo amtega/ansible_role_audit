@@ -1,15 +1,11 @@
 ---
 # Role default lower priority variables
 
-audit_log_file: "/var/log/audit/audit.log"
-audit_max_log_size: "8"
-audit_max_log_file_action: "keep_logs"
 
-########
-audit_conf_file: /etc/audit/auditd.conf
-audit_template_file: NONE
-
-audit_rules_file: /etc/audit/rules.d/audit.rules
+#audit_template_file: null
+audit_template_file: templates/audit_rules.j2
+#audit_rules_file: /etc/audit/rules.d/audit.rules
+audit_rules_file: /etc/audit/rules.d/40-local.rules
 audit_rules:
   # - action: (-a) two posibles values; always or never
   #   filter: (-F) kernel rule-matching filter (tals, exit, user and exclude) applied to the event
@@ -21,7 +17,7 @@ audit_rules_raw_list:
   # first section, control rules
   - "-D # removes all previous rules"
   - "-b 3074 #define buffer size"
-  - "-f 4 #panic on failure"
+  - "-f 2 #panic on failure"
   - "-r 120 #create at most 120 audit messages per second"
   # Registrar los eventos que modifican información del reloj del sistema:
   - "-a always,exit -F arch=<ARCH> -S adjtimex -S settimeofday -S stime -k time-change"
@@ -69,6 +65,7 @@ audit_rules_raw_list:
   - "-w /sbin/modprobe -p x -k modules"
   - "-a always,exit -S init_module -S delete_module -k modules"
   # Evitar cambios en la configuración de auditoría
-  - "-e 2"
+  #- "-e 2"
+  - "-e 1"
 
 ## use tempalte for configuring audit ??

@@ -75,11 +75,11 @@
   tags:
     - idempotence
 
-# - name: Cleanup vagrant sandbox
-#   hosts: localhost
-#   roles:
-#     - role: amtega.vagrant_sandbox
-#       vagrant_sandbox_state: absent
-#   tags:
-#     - cleanup
-#     - sandbox
+- name: Cleanup vagrant sandbox
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_sandbox
+      vagrant_sandbox_state: absent
+  tags:
+    - cleanup
+    - sandbox

@@ -1,6 +1,13 @@
 ---
 # Role handlers
-- name: restart auditd
+- name: start auditd
   service:
     name: auditd
-    state: restarted
+    state: started
+
+- name: restart auditd
+  # service:
+  #   name: auditd
+  #   state: restarted
+  become: true
+  command: service auditd restart
