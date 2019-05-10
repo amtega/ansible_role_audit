@@ -4,7 +4,6 @@
 
 #audit_template_file: null
 audit_template_file: templates/audit_rules.j2
-#audit_rules_file: /etc/audit/rules.d/audit.rules
 audit_rules_file: /etc/audit/rules.d/40-local.rules
 audit_rules:
   # - action: (-a) two posibles values; always or never
@@ -14,58 +13,3 @@ audit_rules:
 
 # list of raw rules to apply
 audit_rules_raw_list:
-  # first section, control rules
-  - "-D # removes all previous rules"
-  - "-b 3074 #define buffer size"
-  - "-f 2 #panic on failure"
-  - "-r 120 #create at most 120 audit messages per second"
-  # Registrar los eventos que modifican información del reloj del sistema:
-  - "-a always,exit -F arch=<ARCH> -S adjtimex -S settimeofday -S stime -k time-change"
-  - "-a always,exit -F arch=<ARCH> -S clock_settime -k time-change"
-  - "-w /etc/localtime -p wa -k time-change"
-  # Registrar los eventos de modificación de cuentas de usuario
-  - "-w /etc/group -p wa -k identity"
-  - "-w /etc/passwd -p wa -k identity"
-  - "-w /etc/gshadow -p wa -k identity"
-  - "-w /etc/shadow -p wa -k identity"
-  - "-w /etc/security/opasswd -p wa -k identity"
-  # Registrar los eventos de modificación de la configuración de red
-  - "-a exit,always -F arch=<ARCH> -S sethostname -S setdomainname -k system-locale"
-  - "-w /etc/issue -p wa -k system-locale"
-  - "-w /etc/issue.net -p wa -k system-locale"
-  - "-w /etc/hosts -p wa -k system-locale"
-  - "-w /etc/sysconfig/network -p wa -k system-locale"
-  # Registrar los eventos de modificación de configuración de SELinux
-  - "-w /etc/selinux/ -p wa -k MAC-policy"
-  # Registrar los eventos de login/logout
-  - "-w /var/log/faillog -p wa -k logins"
-  - "-w /var/log/lastlog -p wa -k logins"
-  # Registrar los procesos y la información de inicio de sesión
-  - "-w /var/run/utmp -p wa -k session"
-  - "-w /var/log/btmp -p wa -k session"
-  - "-w /var/log/wtmp -p wa -k session"
-  # Registrar los eventos de modificación de permisos en los ficheros:
-  - "-a always,exit -F arch=<ARCH> -S chmod -S fchmod -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod"
-  - "-a always,exit -F arch=<ARCH> -S chown -S fchown -S fchownat -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod"
-  - "-a always,exit -F arch=<ARCH> -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod"
-  # Registrar los intentos fallidos de acceso al sistema
-  - "-a always,exit -F arch=<ARCH> -S creat -S open -S openat -S truncate -S ftruncate \\"
-  - "-F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access"
-  - "-a always,exit -F arch=<ARCH> -S creat -S open -S openat -S truncate -S ftruncate \\"
-  - "-F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access"
-  # Registrar la información de éxitos de exportación a medios
-  - "-a always,exit -F arch=<ARCH> -S mount -F auid>=500 -F auid!=4294967295 -k export"
-  # Registrar los eventos de borrado de ficheros
-  - "-a always,exit -F arch=<ARCH> -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete"
-  # Registrar las acciones de administración de sistema mediante sudo
-  - "-w /etc/sudoers -p wa -k actions"
-  # Registrar la información de carga/descarga de módulos de kernel
-  - "-w /sbin/insmod -p x -k modules"
-  - "-w /sbin/rmmod -p x -k modules"
-  - "-w /sbin/modprobe -p x -k modules"
-  - "-a always,exit -S init_module -S delete_module -k modules"
-  # Evitar cambios en la configuración de auditoría
-  #- "-e 2"
-  - "-e 1"
-
-## use tempalte for configuring audit ??
