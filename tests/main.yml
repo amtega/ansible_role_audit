@@ -1,2 +1,85 @@
 ---
 # Tasks for testing role
+
+- name: Configure vagrant sandbox environment
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_presets
+      vagrant_presets_boxes_json_query: >-
+        [? starts_with(name, `centos-6`)
+           || starts_with(name, `centos-7`)
+           || starts_with(name, `fedora-27`)
+           || starts_with(name, `fedora-28`) ]
+  tags:
+    - sandbox
+
+- name: Run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_sandbox
+      vagrant_sandbox_state: started
+  tags:
+    - sandbox
+
+- name: Prepare some variables required by the tests
+  hosts: vagrant_sandbox_vms
+  tasks:
+    - name: Setup some variables required by tests
+      set_fact:
+        iptables_zone_SERVICE:
+          name: SERVICE
+          interfaces: eth0
+          log: yes
+        iptables_service_ss:
+          name: ssh
+          ports: 22
+          zones: SERVICE
+  tags:
+    - idempotence
+
+# - name: Test iptables role
+#   hosts: vagrant_sandbox_vms
+#   roles:
+#     - role: amtega.iptables
+#   vars:
+#     iptables_services:
+#       - name: http
+#         protocol: tcp
+#         ports:
+#           - 80
+#           - 8080
+#         zones:
+#           - SERVICE
+#
+#       - name: dns
+#         protocol: udp
+#         ports: 53
+#         zones: SERVICE
+#   tags:
+#     - idempotence
+
+# test role
+# check audit configuration with "auditclt -l" commnad
+- name: test audit role
+  hosts: vagrant_sandbox_vms
+  roles:
+      - role: amtega.audit
+  vars:
+  tasks:
+    - name: check audit configuration
+      command: auditctl -l
+      register: auditctl_ouput
+
+    - debug:
+        var: auditctl_ouput
+  tags:
+    - idempotence
+
+- name: Cleanup vagrant sandbox
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_sandbox
+      vagrant_sandbox_state: absent
+  tags:
+    - cleanup
+    - sandbox

@@ -1,2 +1,14 @@
 ---
 # Role variables
+
+audit_log_file: "/var/log/audit/audit.log"
+audit_max_log_size: "8"
+audit_max_log_file_action: "keep_logs"
+audit_space_left_action: "SYSLOG"
+audit_admin_space_left: 50
+audit_space_left: "{{ audit_admin_space_left + 50 }}"
+
+
+########
+audit_conf_file: /etc/audit/auditd.conf
+audit_arch: b64 # values b32 | b64

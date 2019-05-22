@@ -1,2 +1,15 @@
 ---
 # Role default lower priority variables
+
+
+#audit_template_file: null
+audit_template_file: templates/audit_rules.j2
+audit_rules_file: /etc/audit/rules.d/40-local.rules
+audit_rules:
+  # - action: (-a) two posibles values; always or never
+  #   filter: (-F) kernel rule-matching filter (tals, exit, user and exclude) applied to the event
+  #   call: (-S) system call name
+  #   field: additinoal options such as architecture, PID, GID, etc to modify rule
+
+# list of raw rules to apply
+audit_rules_raw_list:
