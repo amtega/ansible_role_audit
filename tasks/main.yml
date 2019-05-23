@@ -1,31 +1,33 @@
 ---
 # Role tasks
 
-- name: Install required packages
-  include_tasks: install_rhel_centos.yml
-  when: ansible_distribution == "CentOS" or ansible_distribution == "RHEL"
-
-- name: configure template file
-  set_fact:
-    audit_conf_file: templates/audit_config-Centos-6.j2
-  when: ansible_distribution == "CentOS"
-        ansible_distribution_version == 6
-
-- name: configuring audit service
+- name: Setup audit config file
   template:
-    src: audit_config.j2
-    dest: "{{ audit_conf_file }}"
+    src: config.j2
+    dest: "{{ audit_conf_path }}"
 
-- debug:
-    var: audit_template_file
-    verbosity: 2
-
-- name: configuring audit rules from template file
-  template:
-    src: "{{ audit_template_file }}"
-    dest: "{{ audit_rules_file }}"
-  when: audit_template_file is defined and audit_template_file is not none
+- name: Setup audit rules
+  lineinfile:
+    path: "{{ audit_rules_dir }}{{ audit_item.0.file }}"
+    regexp: >-
+      {{ (audit_item.1.state == "present")
+         | ternary(omit, audit_item.1.rule) }}
+    line: >-
+      {{ (audit_item.1.state == "present")
+         | ternary(audit_item.1.rule, omit) }}
+    create: yes
+    state: "{{ audit_item.1.state }}"
+  loop: "{{ audit_rules | subelements('content') }}"
+  loop_control:
+    loop_var: audit_item
+    index_var: audit_index
+    label: >-
+      {{ audit_item.0.file }}
+      {{ audit_index }}
   notify: restart auditd
 
-- name: restart audit service
-  meta: flush_handlers
+- name: Enable and start auditd
+  service:
+    name: auditd
+    enabled: yes
+    state: started

@@ -1,52 +1,41 @@
-# Ansible <!-- this role name --> role
+# Ansible audit role
 
-This is an [Ansible](http://www.ansible.com) role which configures auditing on Linux
-through auditd service for increseasing system security according to audit_rules.j2 template.
-
-## Requirements
-
-[Ansible 2.7+](http://docs.ansible.com/ansible/latest/intro_installation.html)
+This is an [Ansible](http://www.ansible.com) role which configures auditing through auditd service.
 
 ## Role Variables
 
-```
-audit_template_file:
-```
-Template file rules for configuring auditd rules.
-
-```
-audit_rules_file:
-```
-File name to contain the audit rules.
-
 A list of all the default variables for this role is available in `defaults/main.yml`.
 
-## Dependencies
-
-- [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
-- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client)
-- [amtega.packages](https://galaxy.ansible.com/amtega/packages)
-
-## Usage
+## Example Playbook
 
 This is an example playbook:
 
-```yaml
+``` yaml
 ---
-- host: all
-  roles:
+- name: Audit role sample
+  hosts: localhost
+  roles:  
     - amtega.audit
+      vars:
+        audit_rules:
+          - file: 40-local.rules
+            content:
+              - rule: "-a always,exit -F arch=b64 -S adjtimex,settimeofday -F key=time-change"
+                state: present
+
+              - rule: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -F key=time-change"
+                state: present
 ```
 
 ## Testing
 
-Test are based on vagrant virtual machines. The test outputs the rules configured for auditing.
+Tests are based on vagrant virtual machines. You can setup vagrant engine quickly using the playbook `files/setup.yml` available in the role [amtega.vagrant_engine](https://galaxy.ansible.com/amtega/vagrant_engine).
 
-You can run the rest with the following commands:
+Once you have vagrant, you can run the tests with the following commands:
 
 ```shell
 $ cd amtega.audit/tests
-$ ansible-playbook mail.yml
+$ ansible-playbook main.yml
 ```
 
 ## License
@@ -61,4 +50,5 @@ This role is distributed in the hope that it will be useful, but WITHOUT ANY WAR
 
 ## Author Information
 
-- Carlos Chedas Fernandez.
+- Carlos Chedas Fernandez
+- Juan Antonio Valiño García

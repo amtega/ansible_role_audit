@@ -1,7 +1,0 @@
----
-# install_rhel_centos.yml
-
-- name: "install audit package"
-  package:
-    name: audit
-    state: present

@@ -1,15 +1,86 @@
 ---
 # Role default lower priority variables
 
+# Audit config settings. See man auditd.conf(8) for details
 
-#audit_template_file: null
-audit_template_file: templates/audit_rules.j2
-audit_rules_file: /etc/audit/rules.d/40-local.rules
+audit_local_events: yes
+audit_write_logs: yes
+audit_log_file: /var/log/audit/audit.log
+audit_log_group: root
+audit_log_format: RAW
+audit_flush: INCREMENTAL_ASYNC
+audit_freq: 50
+audit_max_log_file: 8
+audit_num_logs: 5
+audit_priority_boost: 4
+audit_disp_qos: lossy
+audit_dispatcher: /sbin/audispd
+audit_name_format: NONE
+audit_name: mydomain
+audit_max_log_file_action: ROTATE
+audit_space_left: 75
+audit_space_left_action: SYSLOG
+audit_verify_email: yes
+audit_action_mail_acct: root
+audit_admin_space_left: 50
+audit_admin_space_left_action: SUSPEND
+audit_disk_full_action: SUSPEND
+audit_disk_error_action: SUSPEND
+audit_use_libwrap: yes
+audit_tcp_listen_port: 60
+audit_tcp_listen_queue: 5
+audit_tcp_max_per_addr: 1
+audit_tcp_client_ports: 1024-65535
+audit_tcp_client_max_idle: 0
+audit_enable_krb5: no
+audit_krb5_principal: auditd
+audit_krb5_key_file: /etc/audit/audit.key
+audit_distribute_network: no
+
 audit_rules:
-  # - action: (-a) two posibles values; always or never
-  #   filter: (-F) kernel rule-matching filter (tals, exit, user and exclude) applied to the event
-  #   call: (-S) system call name
-  #   field: additinoal options such as architecture, PID, GID, etc to modify rule
+  - file: 40-local.rules
+    content:
+      - rule: "-a always,exit -F arch=b64 -S adjtimex,settimeofday -F key=time-change"
+        state: present
 
-# list of raw rules to apply
-audit_rules_raw_list:
+      - rule: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -F key=time-change"
+        state: present
+
+      - rule: "-w /etc/localtime -p wa -k time-change"
+        state: present
+
+      - rule: "-w /etc/group -p wa -k identity"
+        state: present
+
+      - rule: "-w /etc/passwd -p wa -k identity"
+        state: present
+
+      - rule: "-w /etc/gshadow -p wa -k identity"
+        state: present
+
+      - rule: "-w /etc/shadow -p wa -k identity"
+        state: present
+
+      - rule: "-w /etc/security/opasswd -p wa -k identity"
+        state: present
+
+      - rule: "-a always,exit -F arch=b64 -S sethostname,setdomainname -F key=system-locale"
+        state: present
+
+      - rule: "-w /etc/issue -p wa -k system-locale"
+        state: present
+
+      - rule: "-w /etc/issue.net -p wa -k system-locale"
+        state: present
+
+      - rule: "-w /etc/hosts -p wa -k system-locale"
+        state: present
+
+      - rule: "-w /etc/hostname -p wa -k system-locale"
+        state: present
+
+      - rule: "-a always,exit -F dir=/etc/NetworkManager/ -F perm=wa -F key=system-locale"
+        state: present
+
+      - rule: "-a always,exit -F dir=/etc/selinux/ -F perm=wa -F key=MAC-policy"
+        state: present
