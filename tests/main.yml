@@ -1,0 +1,44 @@
+---
+# Tasks for testing role
+
+- name: Configure vagrant sandbox environment
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_presets
+      vagrant_presets_boxes_json_query: >-
+        [? starts_with(name, `centos-6`)
+           || starts_with(name, `centos-7`)
+           || starts_with(name, `fedora-28`)
+           || starts_with(name, `fedora-29`) ]
+  tags:
+    - sandbox
+
+- name: Run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_sandbox
+      vagrant_sandbox_state: started
+  tags:
+    - sandbox
+
+- name: Test audit role
+  hosts: vagrant_sandbox_vms
+  roles:
+      - role: amtega.audit
+        vars:
+          audit_local_events: no
+  tasks:
+    - name: Check audit configuration
+      command: auditctl -l
+      changed_when: false
+  tags:
+    - idempotence
+
+- name: Cleanup vagrant sandbox
+  hosts: localhost
+  roles:
+    - role: amtega.vagrant_sandbox
+      vagrant_sandbox_state: absent
+  tags:
+    - cleanup
+    - sandbox

@@ -1,0 +1,43 @@
+---
+# Role dependencies
+
+galaxy_info:
+  role_name: audit
+  author: Carlos Chedas Fernandez / Juan Antonio Valiño García
+  description: Configures auditing through auditd service.
+  company: AMTEGA - Xunta de Galicia
+  license: GPLv3 or EUPL
+  min_ansible_version: 2.7
+  platforms:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Fedora
+      versions:
+        - 28
+        - 29
+
+  galaxy_tags:
+    - system
+    - security
+    - audit
+
+dependencies:
+  - role: amtega.check_platform
+    vars:
+      check_platform_distributions:
+        centos: 6
+        fedora: 27
+        rhel: 6
+    tags:
+      - role::audit
+
+  - role: amtega.packages
+    vars:
+      packages_os:
+        all:
+          all:
+            audit: present
+    tags:
+      - role::audit

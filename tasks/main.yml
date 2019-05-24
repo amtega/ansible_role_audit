@@ -1,0 +1,33 @@
+---
+# Role tasks
+
+- name: Setup audit config file
+  template:
+    src: config.j2
+    dest: "{{ audit_conf_path }}"
+
+- name: Setup audit rules
+  lineinfile:
+    path: "{{ audit_rules_dir }}{{ audit_item.0.file }}"
+    regexp: >-
+      {{ (audit_item.1.state == "present")
+         | ternary(omit, audit_item.1.rule) }}
+    line: >-
+      {{ (audit_item.1.state == "present")
+         | ternary(audit_item.1.rule, omit) }}
+    create: yes
+    state: "{{ audit_item.1.state }}"
+  loop: "{{ audit_rules | subelements('content') }}"
+  loop_control:
+    loop_var: audit_item
+    index_var: audit_index
+    label: >-
+      {{ audit_item.0.file }}
+      {{ audit_index }}
+  notify: restart auditd
+
+- name: Enable and start auditd
+  service:
+    name: auditd
+    enabled: yes
+    state: started
