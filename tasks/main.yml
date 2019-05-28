@@ -6,9 +6,17 @@
     src: config.j2
     dest: "{{ audit_conf_path }}"
 
+- name: Setup audit sysconfig file
+  lineinfile:
+    path: "{{ audit_sysconfig_path }}"
+    regexp: '^USE_AUGENRULES=\"no\"'
+    line: USE_AUGENRULES="yes"
+    backrefs: yes
+  when: ansible_facts.service_mgr != "systemd"
+
 - name: Setup audit rules
   lineinfile:
-    path: "{{ audit_rules_dir }}{{ audit_item.0.file }}"
+    path: "{{ audit_rules_dir }}/{{ audit_item.0.file }}"
     regexp: >-
       {{ (audit_item.1.state == "present")
          | ternary(omit, audit_item.1.rule) }}

@@ -2,8 +2,7 @@
 # Role handlers
 
 - name: Restart auditd
-  service:
-    name: auditd
-    state: restarted
-    use: service
+  command: service auditd restart
+  args:
+    warn: False
   listen: restart auditd

@@ -6,3 +6,6 @@
 audit_conf_dir: /etc/audit
 audit_rules_dir: "{{ audit_conf_dir }}/rules.d"
 audit_conf_path: "{{ audit_conf_dir }}/auditd.conf"
+
+# Only for non systemd systems
+audit_sysconfig_path: /etc/sysconfig/auditd
