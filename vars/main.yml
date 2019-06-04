@@ -6,3 +6,4 @@
 audit_conf_dir: /etc/audit
 audit_rules_dir: "{{ audit_conf_dir }}/rules.d"
 audit_conf_path: "{{ audit_conf_dir }}/auditd.conf"
+audit_rules_file: "{{ audit_conf_dir }}/audit.rules"
