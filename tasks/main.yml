@@ -34,8 +34,15 @@
       {{ audit_index }}
   notify: restart auditd
 
-- name: Enable and start auditd
-  service:
-    name: auditd
-    enabled: yes
-    state: started
+- name: Merge audit rules files
+  command: augenrules
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == 6
+
+# - name: Enable and start auditd
+#   command: service auditd restart
+#   register: audit_service_register
+- meta: flush_handlers
+
+- debug:
+    var: audit_service_register
+    verbosity: 2
