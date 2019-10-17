@@ -1,6 +1,33 @@
 ---
 # Role tasks
 
+- include_role:
+    name: amtega.check_platform
+  vars:
+    check_platform_distributions:
+      centos: 6
+      fedora: 27
+      rhel: 6
+
+- include_role:
+    name: amtega.packages
+  vars:
+    packages_os:
+      all:
+        all:
+          audit: present
+
+- include_role:
+    name: amtega.sysctl
+  vars:
+    sysctl:
+      - name: disable_console_log
+        options:
+         - name: kernel.printk
+           value: 3 4 1 7
+           state: present
+           reload: yes
+
 - name: Setup audit config file
   template:
     src: config.j2
@@ -37,12 +64,3 @@
 - name: Merge audit rules files
   command: augenrules
   when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == 6
-
-# - name: Enable and start auditd
-#   command: service auditd restart
-#   register: audit_service_register
-- meta: flush_handlers
-
-- debug:
-    var: audit_service_register
-    verbosity: 2
