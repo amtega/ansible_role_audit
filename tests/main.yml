@@ -10,7 +10,7 @@
            || starts_with(name, `centos-7`)
            || starts_with(name, `fedora-28`)
            || starts_with(name, `fedora-29`) ]
-      
+
   tags:
     - sandbox
 
@@ -25,28 +25,23 @@
 - name: Test audit role
   hosts: vagrant_sandbox_vms
   roles:
-      - role: amtega.audit
-        vars:
-          audit_local_events: no
+    - role: amtega.audit
+      vars:
+        audit_local_events: no
   tasks:
-
     - name: Read audit configuration file
       command: cat "{{ audit_rules_file }}"
       changed_when: false
       register: audit_cat_return
-
-    - set_fact:
-        audit_list: "{{ audit_rules | subelements('content') }}"
 
     - name: Assert rules are loaded
       assert:
         that:
           - audit_cat_return.stdout is search ( "{{ audit_rule_item[1].rule }}" )
       when: audit_rule_item[1].state == "present"
-      loop: "{{ audit_list }}"
+      loop: "{{ audit_rules | subelements('content') }}"
       loop_control:
         loop_var: audit_rule_item
-
   tags:
     - idempotence
 
