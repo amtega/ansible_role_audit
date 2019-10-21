@@ -3,5 +3,6 @@
 
 - name: Restart auditd
   command: service auditd restart
-  register: audit_service_register
+  args:
+    warn: no
   listen: restart auditd
