@@ -16,6 +16,7 @@
       all:
         all:
           audit: present
+          initscripts: present
 
 - include_role:
     name: amtega.sysctl
