@@ -31,7 +31,7 @@
 
 - name: Setup audit config file
   template:
-    src: config.j2
+    src: auditd.conf.j2
     dest: "{{ audit_conf_path }}"
 
 - name: Setup audit sysconfig file
@@ -64,4 +64,4 @@
 
 - name: Merge audit rules files
   command: augenrules
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == 6
+  when: ansible_facts.distribution_major_version is version("6", "==")
