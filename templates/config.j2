@@ -1,0 +1,47 @@
+{{ ansible_managed | comment }}
+
+{%- macro render_option(option) %}
+{%- if option is sameas True %}
+yes
+{%- elif option is sameas False %}
+no
+{%- else %}
+{{ option }}
+{%- endif %}
+{%- endmacro %}
+
+{% if ansible_facts.distribution_major_version is version("6", ">") %}
+local_events = {{ render_option(audit_local_events) }}
+write_logs = {{ render_option(audit_write_logs) }}
+verify_email = {{ render_option(audit_verify_email) }}
+distribute_network = {{ render_option(audit_distribute_network) }}
+{% endif %}
+log_file = {{ render_option(audit_log_file) }}
+log_group = {{ render_option(audit_log_group) }}
+log_format = {{ render_option(audit_log_format) }}
+flush = {{ render_option(audit_flush) }}
+freq = {{ render_option(audit_freq) }}
+max_log_file = {{ render_option(audit_max_log_file) }}
+num_logs = {{ render_option(audit_num_logs) }}
+priority_boost = {{ render_option(audit_priority_boost) }}
+disp_qos = {{ render_option(audit_disp_qos) }}
+dispatcher = {{ render_option(audit_dispatcher) }}
+name_format = {{ render_option(audit_name_format) }}
+name = {{ render_option(audit_name) }}
+max_log_file_action = {{ render_option(audit_max_log_file_action) }}
+space_left = {{ render_option(audit_space_left) }}
+space_left_action = {{ render_option(audit_space_left_action) }}
+action_mail_acct = {{ render_option(audit_action_mail_acct) }}
+admin_space_left = {{ render_option(audit_admin_space_left) }}
+admin_space_left_action = {{ render_option(audit_admin_space_left_action) }}
+disk_full_action = {{ render_option(audit_disk_full_action) }}
+disk_error_action = {{ render_option(audit_disk_error_action) }}
+use_libwrap = {{ render_option(audit_use_libwrap) }}
+tcp_listen_port = {{ render_option(audit_tcp_listen_port) }}
+tcp_listen_queue = {{ render_option(audit_tcp_listen_queue) }}
+tcp_max_per_addr = {{ render_option(audit_tcp_max_per_addr) }}
+tcp_client_ports = {{ render_option(audit_tcp_client_ports) }}
+tcp_client_max_idle = {{ render_option(audit_tcp_client_max_idle) }}
+enable_krb5 = {{ render_option(audit_enable_krb5) }}
+krb5_principal = {{ render_option(audit_krb5_principal) }}
+krb5_key_file = {{ render_option(audit_krb5_key_file) }}
