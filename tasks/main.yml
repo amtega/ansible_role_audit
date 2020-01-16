@@ -1,34 +1,6 @@
 ---
 # Role tasks
 
-- include_role:
-    name: amtega.check_platform
-  vars:
-    check_platform_distributions:
-      centos: 6
-      fedora: 27
-      redhat: 6
-
-- include_role:
-    name: amtega.packages
-  vars:
-    packages_os:
-      all:
-        all:
-          audit: present
-          initscripts: present
-
-- include_role:
-    name: amtega.sysctl
-  vars:
-    sysctl:
-      - name: disable_console_log
-        options:
-         - name: kernel.printk
-           value: 3 4 1 7
-           state: present
-           reload: yes
-
 - name: Setup audit config file
   template:
     src: auditd.conf.j2
