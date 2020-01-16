@@ -25,13 +25,26 @@ galaxy_info:
 
 dependencies:
   - role: amtega.check_platform
-    tags:
-      - never
+    vars:
+      check_platform_distributions:
+        centos: 6
+        fedora: 27
+        redhat: 6
 
   - role: amtega.packages
-    tags:
-      - never
+    vars:
+      packages_os:
+        all:
+          all:
+            audit: present
+            initscripts: present
 
   - role: amtega.sysctl
-    tags:
-      - never
+    vars:
+      sysctl:
+        - name: disable_console_log
+          options:
+           - name: kernel.printk
+             value: 3 4 1 7
+             state: present
+             reload: yes
