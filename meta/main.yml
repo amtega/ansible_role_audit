@@ -7,7 +7,7 @@ galaxy_info:
   description: Configures auditing through auditd service.
   company: AMTEGA - Xunta de Galicia
   license: GPLv3 or EUPL
-  min_ansible_version: 2.8
+  min_ansible_version: 2.9
   platforms:
     - name: EL
       versions:
@@ -15,8 +15,8 @@ galaxy_info:
         - 7
     - name: Fedora
       versions:
-        - 28
         - 29
+        - 30
 
   galaxy_tags:
     - system
@@ -28,7 +28,7 @@ dependencies:
     vars:
       check_platform_distributions:
         centos: 6
-        fedora: 27
+        fedora: 29
         redhat: 6
 
   - role: amtega.packages
