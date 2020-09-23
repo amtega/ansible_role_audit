@@ -25,6 +25,7 @@
          | ternary(audit_item.1.rule, omit) }}
     create: yes
     state: "{{ audit_item.1.state }}"
+  register: audit_setup_rules_result
   loop: "{{ audit_rules | subelements('content') }}"
   loop_control:
     loop_var: audit_item
@@ -36,4 +37,6 @@
 
 - name: Merge audit rules files
   command: augenrules
-  when: ansible_facts.distribution_major_version is version("6", "==")
+  when:
+    - ansible_facts.distribution_major_version is version("6", "==")
+    - audit_setup_rules_result.results | select("changed") | list | length > 0
