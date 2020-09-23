@@ -2,7 +2,11 @@
 # Role handlers
 
 - name: Restart auditd
-  command: service auditd restart
+  command: "{{ auditd_service_command }} auditd restart"
   args:
     warn: no
   listen: restart auditd
+  vars:
+    auditd_service_command: >-
+      {{ (ansible_facts.distribution_major_version is version("6", ">"))
+         | ternary("/usr/sbin/service", "/sbin/service") }}
