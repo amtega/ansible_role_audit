@@ -3,6 +3,7 @@
 - name: Prepare CentOS 6 hosts
   hosts: molecule_hosts_centos_6
   gather_facts: no
+  become: yes
   tasks:
     - name: Disable repos mirror list
       replace:

@@ -47,7 +47,7 @@ dependencies:
       sysctl:
         - name: disable_console_log
           options:
-           - name: kernel.printk
-             value: 3 4 1 7
-             state: present
-             reload: yes
+            - name: kernel.printk
+              value: 3 4 1 7
+              state: present
+              reload: yes
