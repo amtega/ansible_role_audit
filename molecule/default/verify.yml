@@ -23,3 +23,9 @@
       loop: "{{ audit_rules | subelements('content') }}"
       loop_control:
         loop_var: audit_rule_item
+
+    - name: Force logrotate
+      command: "logrotate -f {{ audit_logrotate_config_path }}"
+      register: logrotate_result
+
+    - debug: var=logrotate_result
