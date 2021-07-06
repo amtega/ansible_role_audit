@@ -1,0 +1,4 @@
+{{ ansible_managed | comment }}
+
+{{ audit_log_file }} {
+{{ audit_logrotate_config | indent(width=2, first=true) }}}

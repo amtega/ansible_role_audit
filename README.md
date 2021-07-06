@@ -31,15 +31,6 @@ This is an example playbook:
 
 Tests are based on [molecule](https://molecule.readthedocs.io/en/latest/installation.html) with vagrant virtual machines.
 
-Third party modules are needed for vagrant to be supported:
-
-```shell
-# Use of virtualenv is recommended
-python3 -m pip install --upgrade molecule-vagrant
-```
-
-To run the tests:
-
 ```shell
 cd amtega.audit
 
@@ -48,7 +39,7 @@ molecule test --all
 
 ## License
 
-Copyright (C) 2020 AMTEGA - Xunta de Galicia
+Copyright (C) 2021 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 
