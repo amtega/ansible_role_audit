@@ -7,25 +7,25 @@ audit_local_events: yes
 audit_write_logs: yes
 audit_log_file: /var/log/audit/audit.log
 audit_log_group: root
-audit_log_format: RAW
-audit_flush: INCREMENTAL_ASYNC
+audit_log_format: raw
+audit_flush: incremental_async
 audit_freq: 50
 audit_max_log_file: 8
 audit_num_logs: 5
 audit_priority_boost: 4
 audit_disp_qos: lossy
 audit_dispatcher: /sbin/audispd
-audit_name_format: NONE
+audit_name_format: none
 audit_name: mydomain
-audit_max_log_file_action: ROTATE
+audit_max_log_file_action: ignore
 audit_space_left: 75
-audit_space_left_action: SYSLOG
+audit_space_left_action: syslog
 audit_verify_email: yes
 audit_action_mail_acct: root
 audit_admin_space_left: 50
-audit_admin_space_left_action: SUSPEND
-audit_disk_full_action: SUSPEND
-audit_disk_error_action: SUSPEND
+audit_admin_space_left_action: suspend
+audit_disk_full_action: suspend
+audit_disk_error_action: suspend
 audit_use_libwrap: yes
 audit_tcp_listen_port: 60
 audit_tcp_listen_queue: 5
@@ -40,10 +40,14 @@ audit_distribute_network: no
 audit_rules:
   - file: 40-local.rules
     content:
-      - rule: "-a always,exit -F arch=b64 -S adjtimex,settimeofday -F key=time-change"
+      - rule: >-
+          -a always,exit -F arch=b64 -S adjtimex,settimeofday
+          -F key=time-change
         state: present
 
-      - rule: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -F key=time-change"
+      - rule: >-
+          -a always,exit -F arch=b64 -S clock_settime -F a0=0x0
+          -F key=time-change
         state: present
 
       - rule: "-w /etc/localtime -p wa -k time-change"
@@ -64,7 +68,9 @@ audit_rules:
       - rule: "-w /etc/security/opasswd -p wa -k identity"
         state: present
 
-      - rule: "-a always,exit -F arch=b64 -S sethostname,setdomainname -F key=system-locale"
+      - rule: >-
+          -a always,exit -F arch=b64 -S sethostname,setdomainname
+          -F key=system-locale
         state: present
 
       - rule: "-w /etc/issue -p wa -k system-locale"
@@ -79,8 +85,28 @@ audit_rules:
       - rule: "-w /etc/hostname -p wa -k system-locale"
         state: present
 
-      - rule: "-a always,exit -F dir=/etc/NetworkManager/ -F perm=wa -F key=system-locale"
+      - rule: >-
+          -a always,exit -F dir=/etc/NetworkManager/ -F perm=wa
+          -F key=system-locale
         state: present
 
       - rule: "-a always,exit -F dir=/etc/selinux/ -F perm=wa -F key=MAC-policy"
         state: present
+
+# Logrotate config path. If empty no logrotate config will be created
+
+audit_logrotate_config_path: /etc/logrotate.d/audit
+
+# Logrotate configuration
+
+audit_logrotate_config: |
+  compress
+  copytruncate
+  rotate 732
+  daily
+  dateext
+  dateformat -%Y%m%d
+  nomissingok
+  notifempty
+  shred
+  shredcycles 1

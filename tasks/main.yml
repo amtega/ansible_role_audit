@@ -5,6 +5,7 @@
   template:
     src: auditd.conf.j2
     dest: "{{ audit_conf_path }}"
+    mode: 0640
 
 - name: Setup audit sysconfig file
   lineinfile:
@@ -12,6 +13,7 @@
     regexp: '^USE_AUGENRULES=\"no\"'
     line: USE_AUGENRULES="yes"
     backrefs: yes
+    mode: 0644
   when: ansible_facts.service_mgr != "systemd"
 
 - name: Setup audit rules
@@ -25,6 +27,7 @@
          | ternary(audit_item.1.rule, omit) }}
     create: yes
     state: "{{ audit_item.1.state }}"
+    mode: 0640
   register: audit_setup_rules_result
   loop: "{{ audit_rules | subelements('content') }}"
   loop_control:
@@ -40,3 +43,10 @@
   when:
     - ansible_facts.distribution_major_version is version("6", "==")
     - audit_setup_rules_result.results | select("changed") | list | length > 0
+
+- name: Setup logrotate configuration file
+  template:
+    src: logrotate.j2
+    dest: "{{ audit_logrotate_config_path }}"
+    mode: 0644
+  when: audit_logrotate_config_path | default("") | length > 0
