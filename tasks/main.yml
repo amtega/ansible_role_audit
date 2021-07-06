@@ -6,6 +6,7 @@
     src: auditd.conf.j2
     dest: "{{ audit_conf_path }}"
     mode: 0640
+  notify: restart auditd
 
 - name: Setup audit sysconfig file
   lineinfile:
@@ -15,6 +16,7 @@
     backrefs: yes
     mode: 0644
   when: ansible_facts.service_mgr != "systemd"
+  notify: restart auditd
 
 - name: Setup audit rules
   lineinfile:
