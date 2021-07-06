@@ -12,7 +12,7 @@
 
     - name: Read audit configuration file
       command: "cat {{ audit_rules_dir }}/{{ audit_rules.0.file }}"
-      changed_when: false
+      changed_when: no
       register: audit_cat_return
 
     - name: Assert rules are loaded
@@ -25,7 +25,10 @@
         loop_var: audit_rule_item
 
     - name: Force logrotate
-      command: "logrotate -f {{ audit_logrotate_config_path }}"
+      command: "logrotate -vf {{ audit_logrotate_config_path }}"
+      changed_when: yes
       register: logrotate_result
 
-    - debug: var=logrotate_result
+    - name: Check logrotate output
+      assert:
+        that: logrotate_result.stderr is search("needs rotating")
