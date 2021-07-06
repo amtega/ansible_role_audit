@@ -40,3 +40,9 @@
   when:
     - ansible_facts.distribution_major_version is version("6", "==")
     - audit_setup_rules_result.results | select("changed") | list | length > 0
+
+- name: Setup logrotate configuration file
+  template:
+    src: logrotate.j2
+    dest: "{{ audit_logrotate_config_path }}"
+  when: audit_logrotate_config_path | default("") | length > 0
