@@ -40,6 +40,7 @@ dependencies:
           all:
             audit: present
             initscripts: present
+            logrotate: present
 
   - role: amtega.sysctl
     vars:
