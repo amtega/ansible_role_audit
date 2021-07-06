@@ -40,10 +40,14 @@ audit_distribute_network: no
 audit_rules:
   - file: 40-local.rules
     content:
-      - rule: "-a always,exit -F arch=b64 -S adjtimex,settimeofday -F key=time-change"
+      - rule: >-
+          -a always,exit -F arch=b64 -S adjtimex,settimeofday
+          -F key=time-change
         state: present
 
-      - rule: "-a always,exit -F arch=b64 -S clock_settime -F a0=0x0 -F key=time-change"
+      - rule: >-
+          -a always,exit -F arch=b64 -S clock_settime -F a0=0x0
+          -F key=time-change
         state: present
 
       - rule: "-w /etc/localtime -p wa -k time-change"
@@ -64,7 +68,9 @@ audit_rules:
       - rule: "-w /etc/security/opasswd -p wa -k identity"
         state: present
 
-      - rule: "-a always,exit -F arch=b64 -S sethostname,setdomainname -F key=system-locale"
+      - rule: >-
+          -a always,exit -F arch=b64 -S sethostname,setdomainname
+          -F key=system-locale
         state: present
 
       - rule: "-w /etc/issue -p wa -k system-locale"
@@ -79,7 +85,9 @@ audit_rules:
       - rule: "-w /etc/hostname -p wa -k system-locale"
         state: present
 
-      - rule: "-a always,exit -F dir=/etc/NetworkManager/ -F perm=wa -F key=system-locale"
+      - rule: >-
+          -a always,exit -F dir=/etc/NetworkManager/ -F perm=wa
+          -F key=system-locale
         state: present
 
       - rule: "-a always,exit -F dir=/etc/selinux/ -F perm=wa -F key=MAC-policy"
@@ -97,7 +105,7 @@ audit_logrotate_config: |
   rotate 732
   daily
   dateext
-  dateformat -%Y%m%d_%H%M
+  dateformat -%Y%m%d
   nomissingok
   notifempty
   shred
