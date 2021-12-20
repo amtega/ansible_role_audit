@@ -46,9 +46,80 @@
     - ansible_facts.distribution_major_version is version("6", "==")
     - audit_setup_rules_result.results | select("changed") | list | length > 0
 
-- name: Setup logrotate configuration file
-  template:
-    src: logrotate.j2
-    dest: "{{ audit_logrotate_config_path }}"
-    mode: 0644
+- name: Setup audit log rotation
   when: audit_logrotate_config_path | default("") | length > 0
+  block:
+    - name: Setup logrotate configuration file
+      template:
+        src: logrotate.j2
+        dest: "{{ audit_logrotate_config_path }}"
+        mode: 0644
+
+    - name: Setup SELinux audit logrotate policy
+      when: ansible_facts.selinux.mode | default("") == "enforcing"
+      block:
+        - name: Gather SELinux policy modules
+          command: /usr/sbin/semodule -l
+          changed_when: no
+          register: audit_selinux_gather_pm_result
+
+        - name: Build and install SELinux audit logrotate policy
+          when: >-
+            audit_selinux_gather_pm_result.stdout_lines
+            | select("search",
+                     "^" + audit_logrotate_selinux_policy_name + "[\s0-9.]*$")
+            | list
+            | length == 0
+            or audit_logrotate_selinux_policy_force | bool
+          block:
+            - name: >-
+                Setup temporary directory for SELinux audit logrotate policy
+                module
+              ansible.builtin.tempfile:
+                state: directory
+              register: audit_selinux_tmp_result
+
+            - name: Setup SELinux audit logrotate policy module content
+              template:
+                src: auditd_logrotate.te.j2
+                dest: "{{ auditd_logrotate_selinux_policy_source_path }}"
+                mode: 0600
+
+            - name: Generate SELinux audit logrotate policy module
+              command: >-
+                /usr/bin/checkmodule
+                -M -m
+                -o {{ auditd_logrotate_selinux_policy_module_path }}
+                {{ auditd_logrotate_selinux_policy_source_path }}
+
+            - name: Compile SELinux audit logrotate policy module
+              command: >-
+                /usr/bin/semodule_package
+                -o {{ auditd_logrotate_selinux_policy_pp_path }}
+                -m {{ auditd_logrotate_selinux_policy_module_path }}
+
+            - name: Install SELinux audit logrotate policy module
+              command: >-
+                /usr/sbin/semodule -i
+                {{ auditd_logrotate_selinux_policy_pp_path }}
+          always:
+            - name: >-
+                Remove temporary directory for SELinux audit logrotate policy
+                module
+              file:
+                path: "{{ audit_selinux_tmp_result.path }}"
+                state: absent
+      vars:
+        auditd_logrotate_selinux_policy_source_path: >-
+          {{ audit_selinux_tmp_result.path
+             + "/"
+             + audit_logrotate_selinux_policy_name
+             + ".te" }}
+
+        auditd_logrotate_selinux_policy_module_path: >-
+          {{ auditd_logrotate_selinux_policy_source_path
+             | regex_replace("\.te$", ".mod") }}
+
+        auditd_logrotate_selinux_policy_pp_path: >-
+          {{ auditd_logrotate_selinux_policy_source_path
+             | regex_replace("\.te$", ".pp") }}
