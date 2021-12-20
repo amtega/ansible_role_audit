@@ -110,3 +110,8 @@ audit_logrotate_config: |
   notifempty
   shred
   shredcycles 1
+
+# Force logrotate SELinux policy deployment althogh role detects seems no to
+# be necessary
+
+audit_logrotate_selinux_policy_force: no
