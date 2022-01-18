@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2022-01-18
+### Changed
+- Supported distros.
+- Improved tests.
+
 ## [1.3.0] - 2021-12-20
 ### Added
 - Logrotate SELinux policy module
