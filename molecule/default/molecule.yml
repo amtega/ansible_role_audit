@@ -28,19 +28,19 @@ platforms:
       - molecule_hosts
       - molecule_hosts_centos
   - name: "centos8-${INSTANCE_UUID:-1}"
-    box: centos/8
+    box: centos/stream8
     memory: 1024
     groups:
       - molecule_hosts
       - molecule_hosts_centos
   - name: "fedora34-${INSTANCE_UUID:-1}"
-    box: fedora/33-cloud-base
+    box: fedora/34-cloud-base
     memory: 1024
     groups:
       - molecule_hosts
       - molecule_hosts_fedora
   - name: "fedora35-${INSTANCE_UUID:-1}"
-    box: fedora/34-cloud-base
+    box: fedora/35-cloud-base
     memory: 1024
     groups:
       - molecule_hosts
