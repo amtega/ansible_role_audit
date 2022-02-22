@@ -40,24 +40,13 @@ dependencies:
           all:
             audit: present
             initscripts: present
-            logrotate: present
-        centos:
-          7:
             checkpolicy: present
+          7:            
             policycoreutils-python: present
           8:
-            checkpolicy: present
             policycoreutils: present
         fedora:
           all:
-            checkpolicy: present
-            policycoreutils: present
-        redhat:
-          7:
-            checkpolicy: present
-            policycoreutils-python: present
-          8:
-            checkpolicy: present
             policycoreutils: present
 
   - role: amtega.sysctl
