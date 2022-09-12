@@ -5,32 +5,33 @@
   become: yes
   tasks:
     - name: Include role default vars
-      include_vars: ../../defaults/main.yml
+      ansible.builtin.include_vars: ../../defaults/main.yml
 
     - name: Include role insternal vars
-      include_vars: ../../vars/main.yml
+      ansible.builtin.include_vars: ../../vars/main.yml
 
     - name: Read audit configuration file
-      command: "cat {{ audit_rules_dir }}/{{ audit_rules.0.file }}"
+      ansible.builtin.command: >-
+        cat {{ audit_rules_dir }}/{{ audit_rules.0.file }}
       changed_when: no
       register: audit_cat_return
 
     - name: Assert rules are loaded
-      assert:
+      ansible.builtin.assert:
         quiet: yes
         that:
-          - audit_cat_return.stdout is search ( "{{ audit_rule_item.1.rule }}" )
+          - audit_cat_return.stdout is search ("{{ audit_rule_item.1.rule }}")
       when: audit_rule_item.1.state == "present"
       loop: "{{ audit_rules | subelements('content') }}"
       loop_control:
         loop_var: audit_rule_item
 
     - name: Force logrotate
-      command: "logrotate -vf {{ audit_logrotate_config_path }}"
+      ansible.builtin.command: "logrotate -vf {{ audit_logrotate_config_path }}"
       changed_when: yes
       register: logrotate_result
 
     - name: Check logrotate output
-      assert:
+      ansible.builtin.assert:
         quiet: yes
         that: logrotate_result.stderr is search("needs rotating")
