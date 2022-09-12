@@ -2,7 +2,8 @@
 # Role handlers
 
 - name: Restart auditd
-  command: "{{ auditd_service_command }} auditd restart"
+  ansible.builtin.command: >-
+    {{ auditd_service_ansible.builtin.command }} auditd restart
   args:
     warn: no
   listen: restart auditd
