@@ -1,15 +1,14 @@
 ---
-# Role tasks
 
 - name: Setup audit config file
-  template:
+  ansible.builtin.template:
     src: auditd.conf.j2
     dest: "{{ audit_conf_path }}"
     mode: 0640
   notify: restart auditd
 
 - name: Setup audit sysconfig file
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ audit_sysconfig_path }}"
     regexp: '^USE_AUGENRULES=\"no\"'
     line: USE_AUGENRULES="yes"
@@ -19,7 +18,7 @@
   notify: restart auditd
 
 - name: Setup audit rules
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ audit_rules_dir }}/{{ audit_item.0.file }}"
     regexp: >-
       {{ (audit_item.1.state == "present")
@@ -41,7 +40,7 @@
   notify: restart auditd
 
 - name: Merge audit rules files
-  command: augenrules
+  ansible.builtin.command: augenrules
   when:
     - ansible_facts.distribution_major_version is version("6", "==")
     - audit_setup_rules_result.results | select("changed") | list | length > 0
@@ -50,7 +49,7 @@
   when: audit_logrotate_config_path | default("") | length > 0
   block:
     - name: Setup logrotate configuration file
-      template:
+      ansible.builtin.template:
         src: logrotate.j2
         dest: "{{ audit_logrotate_config_path }}"
         mode: 0644
@@ -59,7 +58,7 @@
       when: ansible_facts.selinux.mode | default("") == "enforcing"
       block:
         - name: Gather SELinux policy modules
-          command: /usr/sbin/semodule -l
+          ansible.builtin.command: /usr/sbin/semodule -l
           changed_when: no
           register: audit_selinux_gather_pm_result
 
@@ -80,33 +79,36 @@
               register: audit_selinux_tmp_result
 
             - name: Setup SELinux audit logrotate policy module content
-              template:
+              ansible.builtin.template:
                 src: auditd_logrotate.te.j2
                 dest: "{{ auditd_logrotate_selinux_policy_source_path }}"
                 mode: 0600
 
             - name: Generate SELinux audit logrotate policy module
-              command: >-
+              ansible.builtin.command: >-
                 /usr/bin/checkmodule
                 -M -m
                 -o {{ auditd_logrotate_selinux_policy_module_path }}
                 {{ auditd_logrotate_selinux_policy_source_path }}
+              changed_when: yes
 
             - name: Compile SELinux audit logrotate policy module
-              command: >-
+              ansible.builtin.command: >-
                 /usr/bin/semodule_package
                 -o {{ auditd_logrotate_selinux_policy_pp_path }}
                 -m {{ auditd_logrotate_selinux_policy_module_path }}
+              changed_when: yes
 
             - name: Install SELinux audit logrotate policy module
-              command: >-
+              ansible.builtin.command: >-
                 /usr/sbin/semodule -i
                 {{ auditd_logrotate_selinux_policy_pp_path }}
+              changed_when: yes
           always:
             - name: >-
                 Remove temporary directory for SELinux audit logrotate policy
                 module
-              file:
+              ansible.builtin.file:
                 path: "{{ audit_selinux_tmp_result.path }}"
                 state: absent
       vars:
